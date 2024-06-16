@@ -6,7 +6,7 @@ plugins {
 
 
 def pluginGroup = 'ru.leonidm.millida'
-def pluginVersion = '1.0.0'
+def pluginVersion = '1.0.1'
 
 
 group pluginGroup

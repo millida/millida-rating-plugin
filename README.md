@@ -75,7 +75,7 @@ API уже есть, но пока никак его не подключить, 
   <dependency>
     <groupId>ru.leonidm.millida</groupId>
     <artifactId>millida-rating-api</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
   </dependency>
 </dependencies>
 ```
@@ -87,7 +87,7 @@ repositories {
 }
 
 dependencies {
-  implementation 'ru.leonidm.millida:millida-rating-api:1.0.0'
+  implementation 'ru.leonidm.millida:millida-rating-api:1.0.1'
 }
 ```
 
