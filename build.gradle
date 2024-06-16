@@ -1,0 +1,100 @@
+plugins {
+    id 'java'
+    id 'net.minecrell.plugin-yml.bukkit' version '0.5.2'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+}
+
+
+def pluginGroup = 'ru.leonidm.millida'
+def pluginVersion = '1.0.0'
+
+
+group pluginGroup
+version pluginVersion
+
+repositories {
+    mavenCentral()
+
+    // > Bukkit
+    maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots' }
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+
+    // > Libraries
+    // NBTAPI
+    maven { url 'https://repo.codemc.io/repository/maven-public/' }
+    // JitPack
+    maven { url 'https://jitpack.io' }
+    // Placeholder API
+    maven { url 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
+}
+
+dependencies {
+    implementation 'org.jetbrains:annotations:22.0.0'
+    implementation 'org.spigotmc:spigot-api:1.8-R0.1-SNAPSHOT'
+
+    implementation project(':api')
+
+    implementation 'com.github.decentsoftware-eu:decentholograms:2.8.8'
+    compileOnly 'me.clip:placeholderapi:2.11.6'
+
+    compileOnly 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor 'org.projectlombok:lombok:1.18.24'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+shadowJar {
+    dependencies {
+        include dependency(':main')
+        include dependency(':api')
+    }
+}
+
+bukkit {
+    name = 'MillidaRating'
+    version = pluginVersion
+    main = 'ru.leonidm.millida.rating.MillidaRatingPlugin'
+    authors = ['LeonidM']
+    softDepend = ['DecentHolograms', 'PlaceholderAPI']
+    commands {
+        rating {
+            usage = '/rating'
+            permission = 'millida.rating.command'
+            aliases = ['mradmin']
+        }
+        rewards {
+            usage = '/rewards'
+            permission = 'millida.rating.command.rewards'
+        }
+        millidaratingadmin {
+            usage = '/millidaratingadmin'
+            permission = 'millida.rating.command.admin'
+            aliases = ['mradmin']
+        }
+    }
+
+    permissions {
+        'millida.rating.rewards' {
+            setDefault('TRUE')
+        }
+        'millida.rating.admin' {
+            setDefault('OP')
+        }
+    }
+}
+
+compileJava.options.encoding = 'UTF-8'
+compileTestJava.options.encoding = 'UTF-8'
+tasks.withType(Javadoc).configureEach { options.encoding = 'UTF-8' }
+
+tasks.withType(JavaCompile) {
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+}
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8

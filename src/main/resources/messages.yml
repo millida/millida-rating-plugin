@@ -1,0 +1,21 @@
+prefix: '[MillidaRating] '
+
+commands:
+  admin:
+    usage:
+     - 'Использование команды /rating admin:'
+     - '- /rating admin clearall — очистить прогресс наград всем игрокам'
+     - '- /rating admin clear <игрок> — очистить прогресс наград конкретному игроку'
+     - '- /rating admin vote <игрок> — выдать один голос игроку'
+     - '- /rating admin reload <*/gui/holograms> — перезагрузить модули плагина'
+     - '- /rating admin hologram tp — телепортировать голограмму с топом к себе'
+
+    unknown_player: '&cУказан неизвестный игрок &f{player}&c!'
+    disabling_module: '&cПерезагрузка привела к ошибкам, подробности в консоли'
+    disabling_plugin: '&cПерезагрузка не завершена, плагин выключается в целях безопасности!'
+
+  ok: 'Команда была выполнена успешно!'
+
+
+# Не меняйте это значение!
+config_version: 1

@@ -1,0 +1,127 @@
+server_id: 87 # ID сервера. Берётся из адреса на сервер: https://rating.millida.net/server-minecraft/87 <--
+request_period: 30 # Период запрашивания информации о последних голосах с сервера Millida Rating в секундах (не меньше 15)
+top_request_period: 60 # Период запрашивания информации о топе игроков с сервера Millida Rating в секундах (не меньше 15)
+
+
+rewards:
+  enabled: true
+
+  default: # Стандартная награда
+    diamond: # Любое название
+      # Доступные плейсхолдеры в команде:
+      # • {player} — ник игрока
+      # • {uuid} — UUID игрока
+      command: 'give {player} diamond' # Не пишите первый слэш команды!
+      online: true # Если true, то команда будет выполнена только тогда, когда игрок будет в сети
+    say:
+      command: 'say {player} проголосовал на rating.millida.net'
+      online: false
+
+  override: # Награда в разные дни. Переопределяет полностью стандартную награду
+    2:
+      diamond:
+        command: 'give {player} diamond 3'
+        online: true
+      say:
+        command: 'say {player} проголосовал на rating.millida.net'
+        online: false
+    11,16,28: # Можно настраивать сразу несколько слотов
+      diamond:
+        command: 'give {player} diamond 3'
+        online: true
+      say:
+        command: 'say {player} проголосовал на rating.millida.net'
+        online: false
+    5,14,25:
+      diamond_block:
+        command: 'give {player} diamond_block 1'
+        online: false
+      say:
+        command: 'say {player} проголосовал на rating.millida.net'
+        online: false
+    22-24,26,27: # Также можно указывать диапазоны
+      diamond:
+        command: 'give {player} diamond 2'
+        online: true
+      say:
+        command: 'say {player} проголосовал на rating.millida.net'
+        online: false
+
+
+  gui:
+    enabled: true
+    # Меняйте это значение в конфиге только после его смены в plugin.yml!
+    command: 'rewards' # Команда, открывающая GUI
+
+    # В версиях 1.16+ также есть поддержка HEX во всех строках, включая названия предметов, в формате <#FFFFFF>
+    title: 'Награды за голосование'
+    message: 'Голосовать тут: https://rating.millida.net/'
+
+    rewards:
+      default: # Иконка стандартной награды
+        id: 'powered_minecart'
+        amount: 1 # По дефолту равен 1
+        name: '&b1 алмаз'
+        lore:
+          - '&7Обычная награда'
+      2,11,16,28: # Иконка 2, 11, 16 и 28 дней
+        id: 'storage_minecart'
+        name: '&b3 алмаза'
+        # player: 'LeonidM' # Также есть поддержка кастомных голов игроков
+        lore:
+          - '&aРедкая награда'
+      5,14,25: # Иконка 5, 14 и 25 дней
+        id: 'explosive_minecart'
+        name: '&b1 алмазный блок'
+        lore:
+          - '&bОчень-редкая награда'
+      22-24,26,27: # Иконка 22, 23, 24, 26 и 27 дней
+        id: 'command_minecart'
+        name: '&b2 алмаза'
+        enchanted: true
+        lore:
+          - '&fНеобычная награда'
+
+      # Настройка для старых версий:
+      # 14:
+      #   id: 160 # Можно указывать числа вместо ID на старых версиях
+      #   data: 15 # Есть возможность выбирать метадату предмета
+    slots:
+      message: 49
+
+    icons:
+      completed: # Иконки забранных наград
+        default: 'minecart'
+        2,11,16,28: 'chest' # Иконка 2, 11, 16 и 28 дней
+        5,14,25: 'tnt' # Иконка 5, 14 и 25 дней
+
+      custom: # Кастомное расположение иконок
+        default: # Иконка стандартного слота, на котором нет награды. Можно убрать или закомментировать
+          id: 'iron_fence'
+        49: # Иконка 49 слота
+          id: 'eye_of_ender'
+          name: '&fГолосуй на &cMillida Rating &a&o(*клик*)'
+
+
+database:
+  # Настройка базы данных пишется именно на этом уровне,
+  # т.е. если Вы захотите подключить MySQL, то нужно
+  # это писать сразу под этим комментарием
+  type: 'sqlite'
+  host: 'data.db'
+
+  sqlite_template: # Шаблон настройки SQLite
+    type: 'sqlite'
+    host: 'data.db'
+
+  mysql_template: # Шаблон настройки MySQL
+    type: 'mysql'
+    host: 'localhost'
+    port: 3306
+    database_name: 'my_db'
+    user: 'db_user'
+    password: 'db_password'
+
+
+# Не меняйте это значение!
+config_version: 1
