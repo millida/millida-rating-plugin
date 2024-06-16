@@ -3,10 +3,12 @@ package ru.leonidm.millida.rating.config.v1.api;
 import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 public interface HologramsConfig {
 
     @NotNull
-    Location getLocation();
+    List<Location> getLocations();
 
     @NotNull
     HologramLines getMonthLines();

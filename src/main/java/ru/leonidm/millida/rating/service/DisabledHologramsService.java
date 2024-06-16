@@ -12,7 +12,12 @@ public class DisabledHologramsService implements HologramsService {
     }
 
     @Override
-    public void teleportHologram(@NotNull Location location) {
+    public void createHologram(@NotNull Location location) {
+
+    }
+
+    @Override
+    public void deleteHolograms(@NotNull Location location) {
 
     }
 

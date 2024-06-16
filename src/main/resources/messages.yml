@@ -8,7 +8,8 @@ commands:
      - '- /rating admin clear <игрок> — очистить прогресс наград конкретному игроку'
      - '- /rating admin vote <игрок> — выдать один голос игроку'
      - '- /rating admin reload <*/gui/holograms> — перезагрузить модули плагина'
-     - '- /rating admin hologram tp — телепортировать голограмму с топом к себе'
+     - '- /rating admin hologram create — создать голограмму с топом'
+     - '- /rating admin hologram delete — удалить голограммы с топом в радиусе 3 блоков'
 
     unknown_player: '&cУказан неизвестный игрок &f{player}&c!'
     disabling_module: '&cПерезагрузка привела к ошибкам, подробности в консоли'

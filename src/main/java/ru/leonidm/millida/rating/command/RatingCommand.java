@@ -211,11 +211,20 @@ public class RatingCommand {
                         .executor((sender, args) -> {
                             if (sender instanceof Player) {
                                 ProxyHologramsService hologramsService = plugin.getHologramsService();
-                                hologramsService.teleportHologram(((Player) sender).getLocation());
+                                hologramsService.createHologram(((Player) sender).getLocation());
                                 sendMessage(sender, messagesConfig.getCommandsMessagesConfig().getOk());
                             }
                         })
-                        .build(), "tp")
+                        .build(), "create")
+                .child(CommandSpec.builder()
+                        .executor((sender, args) -> {
+                            if (sender instanceof Player) {
+                                ProxyHologramsService hologramsService = plugin.getHologramsService();
+                                hologramsService.deleteHolograms(((Player) sender).getLocation());
+                                sendMessage(sender, messagesConfig.getCommandsMessagesConfig().getOk());
+                            }
+                        })
+                        .build(), "delete")
                 .build();
     }
 

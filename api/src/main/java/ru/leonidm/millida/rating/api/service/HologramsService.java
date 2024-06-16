@@ -7,7 +7,9 @@ public interface HologramsService {
 
     void initialize();
 
-    void teleportHologram(@NotNull Location location);
+    void createHologram(@NotNull Location location);
+
+    void deleteHolograms(@NotNull Location location);
 
     void close();
 

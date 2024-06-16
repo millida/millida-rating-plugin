@@ -9,10 +9,13 @@ import ru.leonidm.millida.rating.config.ConfigUtils;
 import ru.leonidm.millida.rating.config.v1.api.HologramLines;
 import ru.leonidm.millida.rating.config.v1.api.HologramsConfig;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 public class HologramsConfigV1 implements HologramsConfig {
 
-    private final Location location;
+    private final List<Location> locations;
     private final HologramLines monthLines;
     private final HologramLines weekLines;
     private final HologramLines dayLines;
@@ -20,7 +23,12 @@ public class HologramsConfigV1 implements HologramsConfig {
     private final float facing;
 
     public HologramsConfigV1(@NotNull ConfigurationSection section) throws ConfigLoadException {
-        location = ConfigUtils.getLocation(section, "location");
+        locations = new ArrayList<>();
+
+        ConfigurationSection rawLocations = ConfigUtils.getSection(section, "locations");
+        for (String key : rawLocations.getKeys(false)) {
+            locations.add(ConfigUtils.getLocation(section, key));
+        }
 
         ConfigurationSection lines = ConfigUtils.getSection(section, "holograms");
 

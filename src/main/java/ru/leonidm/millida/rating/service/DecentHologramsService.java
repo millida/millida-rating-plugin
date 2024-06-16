@@ -8,28 +8,34 @@ import eu.decentsoftware.holograms.api.holograms.Hologram;
 import eu.decentsoftware.holograms.api.holograms.HologramLine;
 import eu.decentsoftware.holograms.api.holograms.HologramPage;
 import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.jetbrains.annotations.NotNull;
 import ru.leonidm.millida.rating.MillidaRatingPlugin;
 import ru.leonidm.millida.rating.api.entity.TopPlayer;
 import ru.leonidm.millida.rating.api.service.HologramsService;
 import ru.leonidm.millida.rating.api.service.RatingRequester;
+import ru.leonidm.millida.rating.config.ConfigLoadException;
+import ru.leonidm.millida.rating.config.ConfigUtils;
 import ru.leonidm.millida.rating.config.v1.api.HologramLines;
 import ru.leonidm.millida.rating.config.v1.api.HologramsConfig;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
 
 public class DecentHologramsService implements HologramsService {
 
+    private final Set<Hologram> holograms = new LinkedHashSet<>();
     private final MillidaRatingPlugin plugin;
     private final HologramsConfig hologramsConfig;
     private final RatingRequester ratingRequester;
-    private Hologram hologram;
+    private int index;
 
     public DecentHologramsService(@NotNull MillidaRatingPlugin plugin, @NotNull HologramsConfig hologramsConfig,
                                   @NotNull RatingRequester ratingRequester) {
@@ -40,43 +46,13 @@ public class DecentHologramsService implements HologramsService {
 
     @Override
     public void initialize() {
-        hologram = DHAPI.createHologram("millida-rating-top", hologramsConfig.getLocation());
-
-        hologram.setUpdateInterval(Integer.MAX_VALUE);
-
-        hologram.setAlwaysFacePlayer(hologramsConfig.isAlwaysFacePlayer());
-        hologram.setFacing(hologramsConfig.getFacing());
-
-        addPage(0, hologramsConfig.getMonthLines(), ratingRequester::getMonthTopPlayers);
-        addPage(1, hologramsConfig.getWeekLines(), ratingRequester::getWeekTopPlayers);
-        addPage(2, hologramsConfig.getDayLines(), ratingRequester::getDayTopPlayers);
-
-        ratingRequester.onTopUpdate(() -> {
-            hologram.updateAll();
-        });
-    }
-
-    @Override
-    public void teleportHologram(@NotNull Location location) {
-        if (hologram != null) {
-            hologram.setLocation(location);
-            hologram.updateAll();
-
-            FileConfiguration config = plugin.getConfig("holograms.yml");
-            config.set("location.world", location.getWorld().getName());
-            config.set("location.x", location.getX());
-            config.set("location.y", location.getY());
-            config.set("location.z", location.getZ());
-
-            try {
-                config.save(new File(plugin.getDataFolder(), "holograms.yml"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        for (Location location : hologramsConfig.getLocations()) {
+            createHologram(location, false);
         }
     }
 
-    private void addPage(int index, @NotNull HologramLines hologramLines, @NotNull Supplier<List<TopPlayer>> supplier) {
+    private void addPage(int index, @NotNull Hologram hologram, @NotNull HologramLines hologramLines,
+                         @NotNull Supplier<List<TopPlayer>> supplier) {
         HologramPage page = hologram.getPage(index);
         if (page == null) {
             page = hologram.addPage();
@@ -131,8 +107,94 @@ public class DecentHologramsService implements HologramsService {
     }
 
     @Override
+    public void createHologram(@NotNull Location location) {
+        createHologram(location, true);
+    }
+
+    private void createHologram(@NotNull Location location, boolean addToConfig) {
+        index++;
+        Hologram hologram = DHAPI.createHologram("millida-rating-top-" + index, location);
+
+        hologram.setUpdateInterval(Integer.MAX_VALUE);
+
+        hologram.setAlwaysFacePlayer(hologramsConfig.isAlwaysFacePlayer());
+        hologram.setFacing(hologramsConfig.getFacing());
+
+        addPage(0, hologram, hologramsConfig.getMonthLines(), ratingRequester::getMonthTopPlayers);
+        addPage(1, hologram, hologramsConfig.getWeekLines(), ratingRequester::getWeekTopPlayers);
+        addPage(2, hologram, hologramsConfig.getDayLines(), ratingRequester::getDayTopPlayers);
+
+        ratingRequester.onTopUpdate(() -> {
+            hologram.updateAll();
+        });
+
+        if (addToConfig) {
+            FileConfiguration config = plugin.getConfig("holograms.yml");
+
+            ConfigurationSection rawLocations = config.getConfigurationSection("locations");
+
+            ConfigurationSection rawLocation = new MemoryConfiguration();
+            rawLocation.set("world", location.getWorld().getName());
+            rawLocation.set("x", location.getX());
+            rawLocation.set("y", location.getY());
+            rawLocation.set("z", location.getZ());
+
+            int i = 0;
+            String key;
+            do {
+                i++;
+                key = "created-" + i;
+            } while (rawLocations.contains(key));
+
+            rawLocations.set(key, rawLocation);
+
+            saveConfig(config);
+        }
+    }
+
+    @Override
+    public void deleteHolograms(@NotNull Location location) {
+        FileConfiguration config = plugin.getConfig("holograms.yml");
+
+        boolean changed = false;
+        for (Hologram hologram : holograms) {
+            if (hologram.getLocation().distance(location) > 3) {
+                continue;
+            }
+
+            hologram.delete();
+
+            ConfigurationSection rawLocations = config.getConfigurationSection("locations");
+            for (String key : rawLocations.getKeys(false)) {
+                Location holoLocation;
+                try {
+                    holoLocation = ConfigUtils.getLocation(rawLocations, key);
+                } catch (ConfigLoadException e) {
+                    continue;
+                }
+
+                if (holoLocation.equals(hologram.getLocation())) {
+                    rawLocations.set(key, null);
+                    changed = true;
+                    break;
+                }
+            }
+        }
+
+        saveConfig(config);
+    }
+
+    private void saveConfig(@NotNull FileConfiguration config) {
+        try {
+            config.save(new File(plugin.getDataFolder(), "holograms.yml"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public void close() {
-        if (hologram != null) {
+        for (Hologram hologram : holograms) {
             hologram.delete();
         }
     }
