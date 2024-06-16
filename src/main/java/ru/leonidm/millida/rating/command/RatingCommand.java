@@ -179,7 +179,6 @@ public class RatingCommand {
                             DeferredRewardRepository deferredRewardRepository = plugin.getDeferredRewardRepository();
 
                             int day = ratingPlayer.getStreak() + 1;
-                            System.out.println("[RatingCommand:181] day: " + day);
 
                             Player player = offlinePlayer.getPlayer();
                             if (player != null) {

@@ -1,4 +1,4 @@
-server_id: 87 # ID сервера. Берётся из адреса на сервер: https://rating.millida.net/server-minecraft/87 <--
+server_id: -1 # ID сервера. Берётся из адреса на сервер: https://rating.millida.net/server-minecraft/87 <--
 request_period: 30 # Период запрашивания информации о последних голосах с сервера Millida Rating в секундах (не меньше 15)
 top_request_period: 60 # Период запрашивания информации о топе игроков с сервера Millida Rating в секундах (не меньше 15)
 
