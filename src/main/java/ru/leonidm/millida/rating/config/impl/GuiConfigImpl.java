@@ -1,4 +1,4 @@
-package ru.leonidm.millida.rating.config.v1;
+package ru.leonidm.millida.rating.config.impl;
 
 import lombok.Data;
 import org.bukkit.Material;
@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.leonidm.millida.rating.config.ConfigLoadException;
 import ru.leonidm.millida.rating.config.ConfigUtils;
-import ru.leonidm.millida.rating.config.v1.api.GuiConfig;
+import ru.leonidm.millida.rating.config.api.GuiConfig;
 import ru.leonidm.millida.rating.external.utils.IntRangeParser;
 
 import java.util.HashMap;
@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Data
-public class GuiConfigV1 implements GuiConfig {
+public class GuiConfigImpl implements GuiConfig {
 
     private final boolean enabled;
     private final String command;
@@ -30,7 +30,7 @@ public class GuiConfigV1 implements GuiConfig {
     private final ItemStack defaultCustomIcon;
     private final Map<Integer, ItemStack> overrodeCustomIcons;
 
-    public GuiConfigV1(@NotNull ConfigurationSection section) throws ConfigLoadException {
+    public GuiConfigImpl(@NotNull ConfigurationSection section) throws ConfigLoadException {
         enabled = ConfigUtils.getBoolean(section, "enabled");
 
         command = ConfigUtils.getString(section, "command");
@@ -125,7 +125,6 @@ public class GuiConfigV1 implements GuiConfig {
         return result;
     }
 
-    @Override
     @NotNull
     public ItemStack getRewardIcon(int day) {
         return overrodeRewardIcons.getOrDefault(day, defaultRewardIcon).clone();
@@ -136,7 +135,6 @@ public class GuiConfigV1 implements GuiConfig {
         return overrodeCompletedIcons.getOrDefault(day, defaultCompletedIcon);
     }
 
-    @Override
     @Nullable
     public ItemStack getCustomIcon(int slot) {
         ItemStack itemStack = overrodeCustomIcons.getOrDefault(slot, defaultCustomIcon);

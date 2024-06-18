@@ -17,8 +17,8 @@ public class DisabledHologramsService implements HologramsService {
     }
 
     @Override
-    public void deleteHolograms(@NotNull Location location) {
-
+    public boolean deleteHolograms(@NotNull Location location) {
+        return false;
     }
 
     @Override

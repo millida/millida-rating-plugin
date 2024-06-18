@@ -8,8 +8,8 @@ import org.jetbrains.annotations.NotNull;
 import ru.leonidm.millida.rating.api.event.OfflinePlayerAwardedEvent;
 import ru.leonidm.millida.rating.api.event.PlayerAwardedEvent;
 import ru.leonidm.millida.rating.api.service.AwardService;
-import ru.leonidm.millida.rating.config.v1.api.Reward;
-import ru.leonidm.millida.rating.config.v1.api.Rewards;
+import ru.leonidm.millida.rating.config.api.Reward;
+import ru.leonidm.millida.rating.config.api.Rewards;
 
 import java.util.List;
 

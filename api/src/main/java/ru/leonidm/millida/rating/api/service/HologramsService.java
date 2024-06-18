@@ -9,7 +9,7 @@ public interface HologramsService {
 
     void createHologram(@NotNull Location location);
 
-    void deleteHolograms(@NotNull Location location);
+    boolean deleteHolograms(@NotNull Location location);
 
     void close();
 

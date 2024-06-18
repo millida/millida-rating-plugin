@@ -2,7 +2,6 @@ package ru.leonidm.millida.rating;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
-import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginManager;
@@ -12,11 +11,11 @@ import ru.leonidm.millida.rating.api.MillidaRatingApi;
 import ru.leonidm.millida.rating.command.RatingCommand;
 import ru.leonidm.millida.rating.command.RewardsCommand;
 import ru.leonidm.millida.rating.config.ConfigLoadException;
-import ru.leonidm.millida.rating.config.ConfigLoader;
-import ru.leonidm.millida.rating.config.v1.api.Config;
-import ru.leonidm.millida.rating.config.v1.api.ConnectionFactory;
-import ru.leonidm.millida.rating.config.v1.api.HologramsConfig;
-import ru.leonidm.millida.rating.config.v1.api.MessagesConfig;
+import ru.leonidm.millida.rating.config.ResourceConfigLoader;
+import ru.leonidm.millida.rating.config.api.Config;
+import ru.leonidm.millida.rating.config.api.ConnectionFactory;
+import ru.leonidm.millida.rating.config.api.HologramsConfig;
+import ru.leonidm.millida.rating.config.api.MessagesConfig;
 import ru.leonidm.millida.rating.handler.GuiHandler;
 import ru.leonidm.millida.rating.handler.PlayerJoinHandler;
 import ru.leonidm.millida.rating.integration.MillidaRatingPlaceholderExpansion;
@@ -59,9 +58,7 @@ public final class MillidaRatingPlugin extends JavaPlugin implements MillidaRati
         Logger logger = getLogger();
         PluginManager pluginManager = Bukkit.getPluginManager();
         try {
-            FileConfiguration fileConfiguration = getConfig();
-            fileConfiguration.setDefaults(new MemoryConfiguration());
-            config = ConfigLoader.load(this, fileConfiguration);
+            config = ResourceConfigLoader.load(this, "config.yml");
         } catch (Throwable t) {
             if (t instanceof ConfigLoadException) {
                 logger.severe("Config is not valid! " + t.getMessage());
@@ -76,7 +73,6 @@ public final class MillidaRatingPlugin extends JavaPlugin implements MillidaRati
         }
 
         ratingRequestService = new ProxyRatingRequestService(new MillidaRatingRequestService(config.getServerId()));
-//        ratingRequestService = new ProxyRatingRequestService(new MillidaRatingRequestService("http://127.0.0.1:5000/"));
 
         ConnectionFactory database = config.getDatabase();
         deferredRewardRepository = new ProxyDeferredRewardRepository(database.createDeferredRewardRepository());
@@ -85,7 +81,7 @@ public final class MillidaRatingPlugin extends JavaPlugin implements MillidaRati
         ratingPlayerRepository = new ProxyRatingPlayerRepository(database.createRatingPlayerRepository());
         ratingPlayerRepository.initialize();
 
-        statisticRepository = new ProxyStatisticRepository(new FileStatisticRepository(this));
+        statisticRepository = new ProxyStatisticRepository(new FileStatisticRepository(ratingRequestService, this));
         statisticRepository.initialize();
 
         awardService = new ProxyAwardService(new AwardServiceImpl(this, config.getRewards()));
@@ -101,10 +97,9 @@ public final class MillidaRatingPlugin extends JavaPlugin implements MillidaRati
         ));
 
         if (pluginManager.isPluginEnabled("DecentHolograms")) {
-            FileConfiguration fileConfiguration = getConfig("holograms.yml");
             HologramsConfig hologramsConfig = null;
             try {
-                hologramsConfig = ConfigLoader.loadHolograms(this, fileConfiguration);
+                hologramsConfig = ResourceConfigLoader.loadHolograms(this, "holograms.yml");
             } catch (Throwable t) {
                 if (t instanceof ConfigLoadException) {
                     logger.severe("Holograms config is not valid! " + t.getMessage());
@@ -147,10 +142,9 @@ public final class MillidaRatingPlugin extends JavaPlugin implements MillidaRati
             logger.severe("Cannot find command 'rating' (did you change incorrectly plugin.yml?)");
             logger.severe(">>> Disabling command module");
         } else {
-            FileConfiguration fileConfiguration = getConfig("messages.yml");
             MessagesConfig messagesConfig = null;
             try {
-                messagesConfig = ConfigLoader.loadMessages(this, fileConfiguration);
+                messagesConfig = ResourceConfigLoader.loadMessages(this, "messages.yml");
             } catch (Throwable t) {
                 if (t instanceof ConfigLoadException) {
                     logger.severe("Messages config is not valid! " + t.getMessage());

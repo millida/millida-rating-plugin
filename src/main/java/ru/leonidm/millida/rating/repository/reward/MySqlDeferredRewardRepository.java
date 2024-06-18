@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 import ru.leonidm.millida.rating.api.entity.DeferredReward;
 import ru.leonidm.millida.rating.api.repository.DeferredRewardRepository;
-import ru.leonidm.millida.rating.config.v1.api.ConnectionFactory;
+import ru.leonidm.millida.rating.config.api.ConnectionFactory;
 import ru.leonidm.millida.rating.repository.MySqlAbstractRepository;
 
 import java.sql.ResultSet;

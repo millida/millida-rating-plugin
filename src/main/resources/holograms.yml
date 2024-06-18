@@ -9,7 +9,7 @@ holograms:
       - '&7x----- &fMillida Rating &7-----x'
       - ''
     lines: # Минимум 1, максимум 10 линий
-      - '&c1{player} &8— &f{votes} голосов'
+      - '&c{player} &8— &f{votes} голосов'
       - '&6{player} &8— &f{votes} голосов'
       - '&e{player} &8— &f{votes} голосов'
       - '&f{player} &8— &f{votes} голосов' # Все остальные будут такие же, как и самая последняя
@@ -22,7 +22,7 @@ holograms:
       - '&7x----- &fMillida Rating &7-----x'
       - ''
     lines:
-      - '&c1{player} &8— &f{votes} голосов'
+      - '&c{player} &8— &f{votes} голосов'
       - '&6{player} &8— &f{votes} голосов'
       - '&e{player} &8— &f{votes} голосов'
       - '&f{player} &8— &f{votes} голосов' # Все остальные будут такие же, как и самая последняя
@@ -35,7 +35,7 @@ holograms:
       - '&7x----- &fMillida Rating &7-----x'
       - ''
     lines:
-      - '&c1{player} &8— &f{votes} голосов'
+      - '&c{player} &8— &f{votes} голосов'
       - '&6{player} &8— &f{votes} голосов'
       - '&e{player} &8— &f{votes} голосов'
       - '&f{player} &8— &f{votes} голосов' # Все остальные будут такие же, как и самая последняя

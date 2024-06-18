@@ -3,7 +3,7 @@ package ru.leonidm.millida.rating.gui;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.NotNull;
-import ru.leonidm.millida.rating.config.v1.api.GuiConfig;
+import ru.leonidm.millida.rating.config.api.GuiConfig;
 
 public final class RewardsGuiHolder implements InventoryHolder {
 

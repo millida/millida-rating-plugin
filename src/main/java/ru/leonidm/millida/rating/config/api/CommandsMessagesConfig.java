@@ -1,4 +1,4 @@
-package ru.leonidm.millida.rating.config.v1.api;
+package ru.leonidm.millida.rating.config.api;
 
 import org.jetbrains.annotations.NotNull;
 

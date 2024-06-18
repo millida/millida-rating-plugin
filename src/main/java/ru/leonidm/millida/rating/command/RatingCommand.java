@@ -16,13 +16,14 @@ import ru.leonidm.millida.rating.api.repository.RatingPlayerRepository;
 import ru.leonidm.millida.rating.api.service.AwardService;
 import ru.leonidm.millida.rating.config.ConfigLoadException;
 import ru.leonidm.millida.rating.config.ConfigLoader;
-import ru.leonidm.millida.rating.config.v1.api.AdminCommandMessagesConfig;
-import ru.leonidm.millida.rating.config.v1.api.Config;
-import ru.leonidm.millida.rating.config.v1.api.ConnectionFactory;
-import ru.leonidm.millida.rating.config.v1.api.GuiConfig;
-import ru.leonidm.millida.rating.config.v1.api.HologramsConfig;
-import ru.leonidm.millida.rating.config.v1.api.MessagesConfig;
-import ru.leonidm.millida.rating.config.v1.api.Rewards;
+import ru.leonidm.millida.rating.config.ResourceConfigLoader;
+import ru.leonidm.millida.rating.config.api.AdminCommandMessagesConfig;
+import ru.leonidm.millida.rating.config.api.Config;
+import ru.leonidm.millida.rating.config.api.ConnectionFactory;
+import ru.leonidm.millida.rating.config.api.GuiConfig;
+import ru.leonidm.millida.rating.config.api.HologramsConfig;
+import ru.leonidm.millida.rating.config.api.MessagesConfig;
+import ru.leonidm.millida.rating.config.api.Rewards;
 import ru.leonidm.millida.rating.external.command.CommandSpec;
 import ru.leonidm.millida.rating.external.command.CommandSpecExecutor;
 import ru.leonidm.millida.rating.repository.FileStatisticRepository;
@@ -220,8 +221,11 @@ public class RatingCommand {
                         .executor((sender, args) -> {
                             if (sender instanceof Player) {
                                 ProxyHologramsService hologramsService = plugin.getHologramsService();
-                                hologramsService.deleteHolograms(((Player) sender).getLocation());
-                                sendMessage(sender, messagesConfig.getCommandsMessagesConfig().getOk());
+                                if (hologramsService.deleteHolograms(((Player) sender).getLocation())) {
+                                    sendMessage(sender, messagesConfig.getCommandsMessagesConfig().getOk());
+                                } else {
+                                    sendMessage(sender, adminCommandMessagesConfig.getHologramCommandMessagesConfig().getNotFound());
+                                }
                             }
                         })
                         .build(), "delete")
@@ -234,10 +238,9 @@ public class RatingCommand {
 
         Logger logger = plugin.getLogger();
         if (Bukkit.getPluginManager().isPluginEnabled("DecentHolograms")) {
-            FileConfiguration fileConfiguration = plugin.getConfig("holograms.yml");
             HologramsConfig hologramsConfig = null;
             try {
-                hologramsConfig = ConfigLoader.loadHolograms(plugin, fileConfiguration);
+                hologramsConfig = ResourceConfigLoader.loadHolograms(plugin, "holograms.yml");
             } catch (Throwable t) {
                 if (t instanceof ConfigLoadException) {
                     logger.severe("Holograms config is not valid! " + t.getMessage());
@@ -266,9 +269,7 @@ public class RatingCommand {
         Logger logger = plugin.getLogger();
         try {
             plugin.reloadConfig();
-            FileConfiguration fileConfiguration = plugin.getConfig();
-            fileConfiguration.setDefaults(new MemoryConfiguration());
-            config = ConfigLoader.load(plugin, fileConfiguration);
+            config = ResourceConfigLoader.load(plugin, "config.yml");
         } catch (Throwable t) {
             if (t instanceof ConfigLoadException) {
                 logger.severe("Config is not valid! " + t.getMessage());
@@ -281,9 +282,13 @@ public class RatingCommand {
             return;
         }
 
-        ProxyRatingPlayerRepository ratingPlayerRepository = plugin.getRatingPlayerRepository();
         Rewards rewards = config.getRewards();
         GuiConfig guiConfig = rewards.getGuiConfig();
+
+        ProxyAwardService awardService = plugin.getAwardService();
+        awardService.setAwardService(new AwardServiceImpl(plugin, rewards));
+
+        ProxyRatingPlayerRepository ratingPlayerRepository = plugin.getRatingPlayerRepository();
         plugin.getGuiService().setGuiService(new GuiServiceImpl(ratingPlayerRepository, rewards, guiConfig));
     }
 
@@ -295,10 +300,9 @@ public class RatingCommand {
             logger.severe(">>> Disabling command module");
             sendMessage(sender, adminCommandMessagesConfig.getDisablingModule());
         } else {
-            FileConfiguration fileConfiguration = plugin.getConfig("messages.yml");
             MessagesConfig messagesConfig = null;
             try {
-                messagesConfig = ConfigLoader.loadMessages(plugin, fileConfiguration);
+                messagesConfig = ResourceConfigLoader.loadMessages(plugin, "messages.yml");
             } catch (Throwable t) {
                 if (t instanceof ConfigLoadException) {
                     logger.severe("Messages config is not valid! " + t.getMessage());
@@ -357,7 +361,7 @@ public class RatingCommand {
             ratingPlayerRepository.initialize();
 
             ProxyStatisticRepository statisticRepository = plugin.getStatisticRepository();
-            statisticRepository.setStatisticRepository(new FileStatisticRepository(plugin));
+            statisticRepository.setStatisticRepository(new FileStatisticRepository(ratingRequestService, plugin));
             statisticRepository.initialize();
 
             ProxyAwardService awardService = plugin.getAwardService();

@@ -1,23 +1,23 @@
-package ru.leonidm.millida.rating.config.v1;
+package ru.leonidm.millida.rating.config.impl;
 
 import lombok.Data;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
 import ru.leonidm.millida.rating.config.ConfigLoadException;
 import ru.leonidm.millida.rating.config.ConfigUtils;
-import ru.leonidm.millida.rating.config.v1.api.HologramLines;
+import ru.leonidm.millida.rating.config.api.HologramLines;
 
 import java.util.List;
 
 @Data
-public class HologramLinesV1 implements HologramLines {
+public class HologramLinesImpl implements HologramLines {
 
     private final List<String> header;
     private final List<String> lines;
     private final String emptyLine;
     private final List<String> footer;
 
-    public HologramLinesV1(@NotNull ConfigurationSection section) throws ConfigLoadException {
+    public HologramLinesImpl(@NotNull ConfigurationSection section) throws ConfigLoadException {
         header = ConfigUtils.getStringList(section, "header");
         lines = ConfigUtils.getStringList(section, "lines");
         if (lines.isEmpty()) {

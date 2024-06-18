@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.leonidm.millida.rating.api.entity.RatingPlayer;
 import ru.leonidm.millida.rating.api.repository.RatingPlayerRepository;
-import ru.leonidm.millida.rating.config.v1.api.ConnectionFactory;
+import ru.leonidm.millida.rating.config.api.ConnectionFactory;
 import ru.leonidm.millida.rating.repository.SqlAbstractRepository;
 
 import java.sql.ResultSet;

@@ -43,7 +43,7 @@ public class MillidaRatingRequestService implements RatingRequestService {
     @NotNull
     @Unmodifiable
     public List<Vote> fetch(int page) {
-        return get(baseUrl + "page/" + page, httpService::getJsonArray).map(jsonArray -> {
+        return get(baseUrl + "page/" + page, url -> httpService.getJsonArray(url, true)).map(jsonArray -> {
             return (List<Vote>) gson.fromJson(jsonArray, VOTES_TYPE);
         }).orElse(Collections.emptyList());
     }
@@ -72,7 +72,7 @@ public class MillidaRatingRequestService implements RatingRequestService {
     @NotNull
     @Unmodifiable
     private List<TopPlayer> top(@NotNull String letter) {
-        return get(baseUrl + "top/1" + letter, httpService::getJsonArray).map(jsonArray -> {
+        return get(baseUrl + "top/1" + letter, url -> httpService.getJsonArray(url, false)).map(jsonArray -> {
             return (List<TopPlayer>) gson.fromJson(jsonArray, TOP_PLAYERS_TYPE);
         }).orElse(Collections.emptyList());
     }

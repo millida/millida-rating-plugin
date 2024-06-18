@@ -1,7 +1,7 @@
 package ru.leonidm.millida.rating.repository;
 
 import org.jetbrains.annotations.NotNull;
-import ru.leonidm.millida.rating.config.v1.api.ConnectionFactory;
+import ru.leonidm.millida.rating.config.api.ConnectionFactory;
 
 import java.sql.ResultSet;
 

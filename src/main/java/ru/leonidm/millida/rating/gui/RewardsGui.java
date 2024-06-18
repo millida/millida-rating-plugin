@@ -8,8 +8,8 @@ import org.jetbrains.annotations.NotNull;
 import ru.leonidm.millida.rating.api.entity.RatingPlayer;
 import ru.leonidm.millida.rating.api.gui.Gui;
 import ru.leonidm.millida.rating.api.repository.RatingPlayerRepository;
-import ru.leonidm.millida.rating.config.v1.api.GuiConfig;
-import ru.leonidm.millida.rating.config.v1.api.Rewards;
+import ru.leonidm.millida.rating.config.api.GuiConfig;
+import ru.leonidm.millida.rating.config.api.Rewards;
 
 public class RewardsGui implements Gui {
 

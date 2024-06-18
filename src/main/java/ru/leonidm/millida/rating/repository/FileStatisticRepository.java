@@ -3,12 +3,15 @@ package ru.leonidm.millida.rating.repository;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+import ru.leonidm.millida.rating.api.entity.Vote;
 import ru.leonidm.millida.rating.api.repository.StatisticRepository;
+import ru.leonidm.millida.rating.api.service.RatingRequestService;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Properties;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
@@ -18,10 +21,12 @@ public class FileStatisticRepository implements StatisticRepository {
     protected final Logger logger = Logger.getLogger("MillidaRating");
 
     private final Properties properties = new Properties();
+    private final RatingRequestService ratingRequestService;
     private final Plugin plugin;
     private final Path path;
 
-    public FileStatisticRepository(@NotNull Plugin plugin) {
+    public FileStatisticRepository(@NotNull RatingRequestService ratingRequestService, @NotNull Plugin plugin) {
+        this.ratingRequestService = ratingRequestService;
         this.plugin = plugin;
 
         path = plugin.getDataFolder().toPath().resolve("statistic.properties");
@@ -33,8 +38,10 @@ public class FileStatisticRepository implements StatisticRepository {
             if (Files.exists(path)) {
                 properties.load(Files.newBufferedReader(path));
             } else {
-                properties.put("last-vote", "0");
-                save(() -> "tried to save last-vote=0");
+                List<Vote> votes = ratingRequestService.fetch(0);
+                long lastId = votes.isEmpty() ? 0 : votes.get(0).getVoteId();
+                properties.put("last-vote", String.valueOf(lastId));
+                save(() -> "tried to save last-vote=" + lastId);
             }
         } catch (IOException e) {
             logger.severe("Cannot load 'statistic.properties' (did you change it?)");

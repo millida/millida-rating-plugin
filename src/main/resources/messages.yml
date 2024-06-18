@@ -1,4 +1,4 @@
-prefix: '[MillidaRating] '
+prefix: '&6[MillidaRating] '
 
 commands:
   admin:
@@ -9,14 +9,17 @@ commands:
      - '- /rating admin vote <игрок> — выдать один голос игроку'
      - '- /rating admin reload <*/gui/holograms> — перезагрузить модули плагина'
      - '- /rating admin hologram create — создать голограмму с топом'
-     - '- /rating admin hologram delete — удалить голограммы с топом в радиусе 3 блоков'
+     - '- /rating admin hologram delete — удалить ближайшую голограмму с топом в радиусе 15 блоков'
 
     unknown_player: '&cУказан неизвестный игрок &f{player}&c!'
     disabling_module: '&cПерезагрузка привела к ошибкам, подробности в консоли'
     disabling_plugin: '&cПерезагрузка не завершена, плагин выключается в целях безопасности!'
 
-  ok: 'Команда была выполнена успешно!'
+    hologram:
+      not_found: '&cНе было найдено ни одной голограммы в радиусе 15 блоков...'
+
+  ok: '&aКоманда была выполнена успешно!'
 
 
 # Не меняйте это значение!
-config_version: 1
+config_version: 2

@@ -11,6 +11,7 @@ import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import ru.leonidm.millida.rating.MillidaRatingPlugin;
 import ru.leonidm.millida.rating.api.entity.TopPlayer;
@@ -18,8 +19,8 @@ import ru.leonidm.millida.rating.api.service.HologramsService;
 import ru.leonidm.millida.rating.api.service.RatingRequester;
 import ru.leonidm.millida.rating.config.ConfigLoadException;
 import ru.leonidm.millida.rating.config.ConfigUtils;
-import ru.leonidm.millida.rating.config.v1.api.HologramLines;
-import ru.leonidm.millida.rating.config.v1.api.HologramsConfig;
+import ru.leonidm.millida.rating.config.api.HologramLines;
+import ru.leonidm.millida.rating.config.api.HologramsConfig;
 
 import java.io.File;
 import java.io.IOException;
@@ -62,8 +63,8 @@ public class DecentHologramsService implements HologramsService {
             DHAPI.addHologramLine(page, header);
         }
 
-        page.addAction(ClickType.LEFT, new Action(ActionType.NEXT_PAGE, hologram.getName()));
-        page.addAction(ClickType.RIGHT, new Action(ActionType.PREV_PAGE, hologram.getName()));
+        page.addAction(ClickType.LEFT, new Action(CyclicNextPageActionType.INSTANCE, null));
+        page.addAction(ClickType.RIGHT, new Action(CyclicPreviousPageActionType.INSTANCE, null));
 
         List<String> playerLines = hologramLines.getLines();
         String emptyLine = hologramLines.getEmptyLine();
@@ -113,7 +114,8 @@ public class DecentHologramsService implements HologramsService {
 
     private void createHologram(@NotNull Location location, boolean addToConfig) {
         index++;
-        Hologram hologram = DHAPI.createHologram("millida-rating-top-" + index, location);
+        Hologram hologram = DHAPI.createHologram("millida-rating-top-" + index, location, false);
+        holograms.add(hologram);
 
         hologram.setUpdateInterval(Integer.MAX_VALUE);
 
@@ -153,16 +155,17 @@ public class DecentHologramsService implements HologramsService {
     }
 
     @Override
-    public void deleteHolograms(@NotNull Location location) {
+    public boolean deleteHolograms(@NotNull Location location) {
         FileConfiguration config = plugin.getConfig("holograms.yml");
 
-        boolean changed = false;
         for (Hologram hologram : holograms) {
-            if (hologram.getLocation().distance(location) > 3) {
+            Location hologramLocation = hologram.getLocation();
+            if (location.getWorld() == hologramLocation.getWorld() && hologramLocation.distance(location) > 15) {
                 continue;
             }
 
             hologram.delete();
+            holograms.remove(hologram);
 
             ConfigurationSection rawLocations = config.getConfigurationSection("locations");
             for (String key : rawLocations.getKeys(false)) {
@@ -173,15 +176,15 @@ public class DecentHologramsService implements HologramsService {
                     continue;
                 }
 
-                if (holoLocation.equals(hologram.getLocation())) {
+                if (holoLocation.distance(hologramLocation) < 0.125) {
                     rawLocations.set(key, null);
-                    changed = true;
-                    break;
+                    saveConfig(config);
+                    return true;
                 }
             }
         }
 
-        saveConfig(config);
+        return false;
     }
 
     private void saveConfig(@NotNull FileConfiguration config) {
@@ -196,6 +199,60 @@ public class DecentHologramsService implements HologramsService {
     public void close() {
         for (Hologram hologram : holograms) {
             hologram.delete();
+        }
+
+        holograms.clear();
+    }
+
+    public static class CyclicNextPageActionType extends ActionType {
+
+        public static final CyclicNextPageActionType INSTANCE = new CyclicNextPageActionType("CYCLIC_PREV_PAGE");
+
+        private CyclicNextPageActionType(@NotNull String name) {
+            super(name);
+        }
+
+        @Override
+        public boolean execute(Player player, String... args) {
+            if (args == null || args.length == 0) {
+                return true;
+            }
+            Hologram hologram = Hologram.getCachedHologram(args[0]);
+            if (hologram == null) {
+                return true;
+            }
+            int nextPage = hologram.getPlayerPage(player) + 1;
+            if (nextPage < 0 || hologram.size() <= nextPage) {
+                nextPage = 0;
+            }
+            hologram.show(player, nextPage);
+            return true;
+        }
+    }
+
+    public static class CyclicPreviousPageActionType extends ActionType {
+
+        public static final CyclicPreviousPageActionType INSTANCE = new CyclicPreviousPageActionType("CYCLIC_NEXT_PAGE");
+
+        private CyclicPreviousPageActionType(@NotNull String name) {
+            super(name);
+        }
+
+        @Override
+        public boolean execute(Player player, String... args) {
+            if (args == null || args.length == 0) {
+                return true;
+            }
+            Hologram hologram = Hologram.getCachedHologram(args[0]);
+            if (hologram == null) {
+                return true;
+            }
+            int prevPage = hologram.getPlayerPage(player) - 1;
+            if (prevPage < 0 || hologram.size() <= prevPage) {
+                prevPage = hologram.size() - 1;
+            }
+            hologram.show(player, prevPage);
+            return true;
         }
     }
 }

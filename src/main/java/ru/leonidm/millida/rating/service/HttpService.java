@@ -26,12 +26,14 @@ public class HttpService {
     }
 
     @NotNull
-    public Optional<JsonArray> getJsonArray(@NotNull URL url) {
+    public Optional<JsonArray> getJsonArray(@NotNull URL url, boolean warn) {
         return getJson(url).map(jsonElement -> {
             if (jsonElement instanceof JsonArray) {
                 return (JsonArray) jsonElement;
             } else {
-                logger.warning("'" + url + "' returned non-array. JSON response: " + jsonElement);
+                if (warn) {
+                    logger.warning("'" + url + "' returned non-array. JSON response: " + jsonElement);
+                }
                 return null;
             }
         });
